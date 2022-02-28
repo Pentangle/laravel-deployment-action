@@ -60,7 +60,6 @@ runs:
         node-version: 16.14
 
     - name: Cache Node Modules
-      shell: bash
       id: node-cache
       uses: actions/cache@v2
       with:
