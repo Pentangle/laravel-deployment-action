@@ -28,22 +28,25 @@ inputs:
 
 runs:
   using: "composite"
-  shell: bash
   steps:
     - uses: actions/laravel-github-deployment
     - uses: actions/checkout@v2
 
     - name: Set the APP_PATH environment variable
+      shell: bash
       id: step_one
       if: ${{ inputs.APP_PATH == '' }}
       run: |
         echo "APP_PATH=/srv/users/${{inputs.SSH_USER}}/apps/${{inputs.APP_NAME}}" >> $GITHUB_ENV
+        
     - name: Use the value
+      shell: bash
       id: step_two
       run: |
         echo "${{ inputs.APP_PATH }}" # This will output the path
 
     - name: Cache Composer dependencies
+      shell: bash
       id: composer-cache
       uses: actions/cache@v2
       with:
@@ -51,15 +54,18 @@ runs:
         key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
 
     - name: Install dependencies
+      shell: bash
       if: steps.composer-cache.outputs.cache-hit != 'true'
       run: composer install --no-progress --optimize-autoloader
 
     - name: Setup Node
+      shell: bash
       uses: actions/setup-node@v2
       with:
         node-version: 16.14
 
     - name: Cache Node Modules
+      shell: bash
       id: node-cache
       uses: actions/cache@v2
       with:
@@ -67,13 +73,16 @@ runs:
         key: node-modules-${{ hashFiles('package-lock.json') }}
 
     - name: Install Dependencies
+      shell: bash
       if: steps.node-cache.outputs.cache-hit != 'true'
       run: npm ci
 
     - name: NPM Build
+      shell: bash
       run: ${{ inputs.BUILD_COMMAND }}
 
     - name: Sync
+      shell: bash
       env:
         dest: ${{inputs.SSH_USER}}@${{inputs.SERVER_IP}}:${{inputs.APP_PATH}}
       run: |
@@ -88,6 +97,7 @@ runs:
           ./ ${{inputs.dest}}
 
     - name: multiple command
+      shell: bash
       uses: appleboy/ssh-action@master
       with:
         host: ${{ inputs.SERVER_IP }}
