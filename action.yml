@@ -1,2 +1,76 @@
 name: Laravel Deployment Action
-description: A currently opionionated github action for deploying laravel apps
+description: A currently opinionated github action for deploying laravel apps
+
+jobs:
+  deploy-development:
+    if: ${{ github.ref == 'refs/heads/development' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/laravel-github-deployment
+      - uses: actions/checkout@v2
+
+      - name: Set the APP_PATH environment variable
+        id: step_one
+        if: ${{ inputs.APP_PATH == '' }}
+        run: |
+          echo "APP_PATH=/srv/users/${{inputs.SSH_USER}}/apps/${{inputs.APP_NAME}}" >> $GITHUB_ENV
+      - name: Use the value
+        id: step_two
+        run: |
+          echo "${{ inputs.APP_PATH }}" # This will output the path
+
+      - name: Cache Composer dependencies
+        id: composer-cache
+        uses: actions/cache@v2
+        with:
+          path: /tmp/composer-cache
+          key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+
+      - name: Install dependencies
+        if: steps.composer-cache.outputs.cache-hit != 'true'
+        run: composer install --no-progress --optimize-autoloader
+
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.14
+
+      - name: Cache Node Modules
+        id: node-cache
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: node-modules-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Dependencies
+        if: steps.node-cache.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: NPM Build
+        run: ${{ inputs.BUILD_COMMAND }}
+
+      - name: Sync
+        env:
+          dest: ${{inputs.SSH_USER}}@${{inputs.SERVER_IP}}:${{inputs.APP_PATH}}
+        run: |
+          echo "${{secrets.DEPLOYKEY}}" > deploy_key
+          chmod 600 ./deploy_key
+          rsync -vzr --stats --checksum \
+            -e 'ssh -i ./deploy_key -o StrictHostKeyChecking=no -p ${{inputs.SERVER_PORT}}' \
+            --exclude /deploy_key \
+            --exclude /.git/ \
+            --exclude /.github/ \
+            --exclude /node_modules/ \
+            ./ ${{inputs.dest}}
+
+      - name: multiple command
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ inputs.SERVER_IP }}
+          username: ${{inputs.SSH_USER}}
+          key: ${{ secrets.DEPLOYKEY }}
+          script: |
+            cd ${{ inputs.APP_PATH }}
+            ${{ inputs.ARTISAN_COMMANDS }}
+
