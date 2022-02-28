@@ -86,7 +86,7 @@ runs:
         dest: ${{inputs.SSH_USER}}@${{inputs.SERVER_IP}}:${{inputs.APP_PATH}}
       shell: bash
       run: |
-        echo "${{inputs.DEPLOYKEY}}" > deploy_key
+        echo "${{inputs.DEPLOY_KEY}}" > deploy_key
         chmod 600 ./deploy_key
         rsync -vzr --stats --checksum \
           -e 'ssh -i ./deploy_key -o StrictHostKeyChecking=no -p ${{inputs.SERVER_PORT}}' \
@@ -101,7 +101,7 @@ runs:
       with:
         host: ${{ inputs.SERVER_IP }}
         username: ${{inputs.SSH_USER}}
-        key: ${{ inputs.DEPLOYKEY }}
+        key: ${{ inputs.DEPLOY_KEY }}
         script: |
           cd ${{ inputs.APP_PATH }}
           ${{ inputs.ARTISAN_COMMANDS }}
