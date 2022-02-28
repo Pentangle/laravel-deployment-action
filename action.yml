@@ -1,5 +1,8 @@
 name: Laravel Deployment Action
 description: A currently opinionated github action for deploying laravel apps
+branding:
+  icon: 'send'
+  color: 'green'
 
 inputs:
   SERVER_IP:
