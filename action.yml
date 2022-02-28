@@ -1,5 +1,6 @@
 name: Laravel Deployment Action
 description: A currently opinionated github action for deploying laravel apps
+author: 'Séan Poynter-Smith'
 branding:
   icon: 'send'
   color: 'green'
