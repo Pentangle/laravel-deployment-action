@@ -28,6 +28,7 @@ inputs:
 
 runs:
   using: "composite"
+  shell: bash
   steps:
     - uses: actions/laravel-github-deployment
     - uses: actions/checkout@v2
