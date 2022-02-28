@@ -57,7 +57,7 @@ runs:
       shell: bash
       run: composer install --no-progress --optimize-autoloader
 
-    - name: Setup Node
+    - name: Setup Node.js 16.14
       uses: actions/setup-node@v2
       with:
         node-version: 16.14
