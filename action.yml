@@ -29,9 +29,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: actions/laravel-github-deployment
-    - uses: actions/checkout@v2
-
     - name: Set the APP_PATH environment variable
       shell: bash
       id: step_one
@@ -46,7 +43,6 @@ runs:
         echo "${{ inputs.APP_PATH }}" # This will output the path
 
     - name: Cache Composer dependencies
-      shell: bash
       id: composer-cache
       uses: actions/cache@v2
       with:
@@ -97,7 +93,6 @@ runs:
           ./ ${{inputs.dest}}
 
     - name: multiple command
-      shell: bash
       uses: appleboy/ssh-action@master
       with:
         host: ${{ inputs.SERVER_IP }}
