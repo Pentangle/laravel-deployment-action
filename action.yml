@@ -9,7 +9,6 @@ inputs:
   SERVER_IP:
     description: 'SERVER_IP'
     required: true
-    default: '1'
   SERVER_PORT:
     description: 'Custom port for ssh and rsync'
     required: false
@@ -34,15 +33,15 @@ runs:
   using: "composite"
   steps:
     - name: Set the APP_PATH environment variable
-      shell: bash
       id: step_one
       if: ${{ inputs.APP_PATH == '' }}
+      shell: bash
       run: |
         echo "APP_PATH=/srv/users/${{inputs.SSH_USER}}/apps/${{inputs.APP_NAME}}" >> $GITHUB_ENV
         
     - name: Use the value
-      shell: bash
       id: step_two
+      shell: bash
       run: |
         echo "${{ inputs.APP_PATH }}" # This will output the path
 
@@ -54,8 +53,8 @@ runs:
         key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
 
     - name: Install dependencies
-      shell: bash
       if: steps.composer-cache.outputs.cache-hit != 'true'
+      shell: bash
       run: composer install --no-progress --optimize-autoloader
 
     - name: Setup Node
@@ -71,8 +70,8 @@ runs:
         key: node-modules-${{ hashFiles('package-lock.json') }}
 
     - name: Install Dependencies
-      shell: bash
       if: steps.node-cache.outputs.cache-hit != 'true'
+      shell: bash
       run: npm ci
 
     - name: NPM Build
@@ -80,9 +79,9 @@ runs:
       run: ${{ inputs.BUILD_COMMAND }}
 
     - name: Sync
-      shell: bash
       env:
         dest: ${{inputs.SSH_USER}}@${{inputs.SERVER_IP}}:${{inputs.APP_PATH}}
+      shell: bash
       run: |
         echo "${{secrets.DEPLOYKEY}}" > deploy_key
         chmod 600 ./deploy_key
