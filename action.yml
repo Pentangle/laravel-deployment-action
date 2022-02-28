@@ -1,1 +1,2 @@
 name: Laravel Deployment Action
+description: A currently opionionated github action for deploying laravel apps
