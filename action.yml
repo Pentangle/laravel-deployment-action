@@ -1,6 +1,33 @@
 name: Laravel Deployment Action
 description: A currently opinionated github action for deploying laravel apps
 
+on:
+  workflow_call:
+    inputs:
+      SERVER_IP:
+        description: 'SERVER_IP'
+        required: true
+        default: '1'
+      SERVER_PORT:
+        description: 'Custom port for ssh and rsync'
+        required: false
+        default: '22'
+      SSH_USER:
+        description: ''
+        required: true
+      APP_NAME:
+        description: ''
+        required: true
+      APP_PATH:
+        description: ''
+        required: true
+      BUILD_COMMAND:
+        description: ''
+        required: true
+      ARTISAN_COMMANDS:
+        description: ''
+        required: false
+
 steps:
   - uses: actions/laravel-github-deployment
   - uses: actions/checkout@v2
