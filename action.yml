@@ -6,6 +6,9 @@ branding:
   color: 'green'
 
 inputs:
+  DEPLOY_KEY:
+    description: 'Deploy Key'
+    required: true
   SERVER_IP:
     description: 'SERVER_IP'
     required: true
@@ -83,7 +86,7 @@ runs:
         dest: ${{inputs.SSH_USER}}@${{inputs.SERVER_IP}}:${{inputs.APP_PATH}}
       shell: bash
       run: |
-        echo "${{secrets.DEPLOYKEY}}" > deploy_key
+        echo "${{inputs.DEPLOYKEY}}" > deploy_key
         chmod 600 ./deploy_key
         rsync -vzr --stats --checksum \
           -e 'ssh -i ./deploy_key -o StrictHostKeyChecking=no -p ${{inputs.SERVER_PORT}}' \
@@ -98,7 +101,7 @@ runs:
       with:
         host: ${{ inputs.SERVER_IP }}
         username: ${{inputs.SSH_USER}}
-        key: ${{ secrets.DEPLOYKEY }}
+        key: ${{ inputs.DEPLOYKEY }}
         script: |
           cd ${{ inputs.APP_PATH }}
           ${{ inputs.ARTISAN_COMMANDS }}
