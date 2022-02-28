@@ -46,7 +46,7 @@ runs:
       id: step_two
       shell: bash
       run: |
-        echo "${{ inputs.APP_PATH ?? env.APP_PATH }}" # This will output the path
+        echo "${{ inputs.APP_PATH || env.APP_PATH }}" # This will output the path
 
     - name: Cache Composer dependencies
       id: composer-cache
@@ -83,7 +83,7 @@ runs:
 
     - name: Sync
       env:
-        dest: ${{inputs.SSH_USER}}@${{inputs.SERVER_IP}}:${{inputs.APP_PATH ?? env.APP_PATH}}
+        dest: ${{inputs.SSH_USER}}@${{inputs.SERVER_IP}}:${{inputs.APP_PATH || env.APP_PATH}}
       shell: bash
       run: |
         echo "${{inputs.DEPLOY_KEY}}" > deploy_key
@@ -103,6 +103,6 @@ runs:
         username: ${{inputs.SSH_USER}}
         key: ${{ inputs.DEPLOY_KEY }}
         script: |
-          cd ${{ inputs.APP_PATH ?? env.APP_PATH }}
+          cd ${{ inputs.APP_PATH || env.APP_PATH }}
           ${{ inputs.ARTISAN_COMMANDS }}
 
