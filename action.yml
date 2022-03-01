@@ -94,7 +94,7 @@ runs:
           --exclude /.git/ \
           --exclude /.github/ \
           --exclude /node_modules/ \
-          ./ ${{inputs.dest}}
+          ./ ${{env.dest}}
 
     - name: multiple command
       uses: appleboy/ssh-action@master
