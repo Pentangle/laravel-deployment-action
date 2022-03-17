@@ -9,15 +9,18 @@ inputs:
   DEPLOY_KEY:
     description: 'SSH key for deploying, Should be added as a **secret**'
     required: true
+    default: ${{ secrets.DEPLOYKEY }}
   SERVER_IP:
     description: 'IP address of the server being deployed to, Should be added as a **secret**'
     required: true
+    default: ${{ secrets.SERVERIP }}
   SERVER_PORT:
     description: 'Custom port for ssh and rsync'
     default: 22
   SSH_USER:
     description: 'required, used for SSH and deployment path if APP_PATH not specified'
     required: true
+    default: ${{ secrets.SSHUSER }}
   APP_NAME:
     description: 'required, used for deployment path if APP_PATH not specified'
     required: true
@@ -27,18 +30,23 @@ inputs:
   COMPOSER_COMMAND:
     description: ''
     default: composer install --no-progress --optimize-autoloader
+    required: false
   NODE_VERSION:
     description: 'version of node to install'
     default: 16.14
+    required: false
   NPM_INSTALL_COMMAND:
     description: 'requires package-lock.json to be present'
     default: npm ci --quiet
+    required: false
   BUILD_COMMAND:
     description: 'build process command'
     default: npm run dev
+    required: false
   ARTISAN_COMMANDS:
     description: 'commands to run on server with prefix'
     default: php artisan inspire
+    required: false
 
 runs:
   using: "composite"
