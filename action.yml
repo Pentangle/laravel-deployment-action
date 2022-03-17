@@ -9,18 +9,15 @@ inputs:
   DEPLOY_KEY:
     description: 'SSH key for deploying, Should be added as a **secret**'
     required: true
-    default: ${{ secrets.DEPLOYKEY }}
   SERVER_IP:
     description: 'IP address of the server being deployed to, Should be added as a **secret**'
     required: true
-    default: ${{ secrets.SERVERIP }}
   SERVER_PORT:
     description: 'Custom port for ssh and rsync'
     default: 22
   SSH_USER:
     description: 'required, used for SSH and deployment path if APP_PATH not specified'
     required: true
-    default: ${{ secrets.SSHUSER }}
   APP_NAME:
     description: 'required, used for deployment path if APP_PATH not specified'
     required: true
