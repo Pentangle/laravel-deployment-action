@@ -15,7 +15,7 @@ inputs:
   SERVER_PORT:
     description: 'Custom port for ssh and rsync'
     required: false
-    default: '22'
+    default: 22
   SSH_USER:
     description: ''
     required: true
@@ -25,6 +25,9 @@ inputs:
   APP_PATH:
     description: ''
     required: false
+  COMPOSER_COMMAND:
+    description: ''
+    default: composer install --no-progress --optimize-autoloader
   BUILD_COMMAND:
     description: ''
     required: true
@@ -58,7 +61,7 @@ runs:
     - name: Install dependencies
       if: steps.composer-cache.outputs.cache-hit != 'true'
       shell: bash
-      run: composer install --no-progress --optimize-autoloader
+      run: ${{ inputs.COMPOSER_COMMAND }}
 
     - name: Setup Node.js 16.14
       uses: actions/setup-node@v2
@@ -89,7 +92,7 @@ runs:
         echo "${{inputs.DEPLOY_KEY}}" > deploy_key
         chmod 600 ./deploy_key
         rsync -vzr --stats --checksum \
-          -e 'ssh -i ./deploy_key -o StrictHostKeyChecking=no -p ${{inputs.SERVER_PORT}}' \
+          -e 'ssh -i ./deploy_key -o StrictHostKeyChecking=no -p ${{inputs.SERVER_PORT || 22}}' \
           --exclude /deploy_key \
           --exclude /.git/ \
           --exclude /.github/ \
