@@ -7,33 +7,38 @@ branding:
 
 inputs:
   DEPLOY_KEY:
-    description: 'Deploy Key'
+    description: 'SSH key for deploying, Should be added as a **secret**'
     required: true
   SERVER_IP:
-    description: 'SERVER_IP'
+    description: 'IP address of the server being deployed to, Should be added as a **secret**'
     required: true
   SERVER_PORT:
     description: 'Custom port for ssh and rsync'
-    required: false
     default: 22
   SSH_USER:
-    description: ''
+    description: 'required, used for SSH and deployment path if APP_PATH not specified'
     required: true
   APP_NAME:
-    description: ''
+    description: 'required, used for deployment path if APP_PATH not specified'
     required: true
   APP_PATH:
-    description: ''
+    description: 'leave blank for /srv/users/<SSH_USER>/apps/<APP_NAME>'
     required: false
   COMPOSER_COMMAND:
     description: ''
     default: composer install --no-progress --optimize-autoloader
+  NODE_VERSION:
+    description: 'version of node to install'
+    default: 16.14
+  NPM_INSTALL_COMMAND:
+    description: 'requires package-lock.json to be present'
+    default: npm ci --quiet
   BUILD_COMMAND:
-    description: ''
-    required: true
+    description: 'build process command'
+    default: npm run dev
   ARTISAN_COMMANDS:
-    description: ''
-    required: false
+    description: 'commands to run on server with prefix'
+    default: php artisan inspire
 
 runs:
   using: "composite"
@@ -66,7 +71,7 @@ runs:
     - name: Setup Node.js 16.14
       uses: actions/setup-node@v2
       with:
-        node-version: 16.14
+        node-version: ${{ inputs.NODE_VERSION }}
 
     - name: Cache Node Modules
       id: node-cache
@@ -78,7 +83,7 @@ runs:
     - name: Install Dependencies
       if: steps.node-cache.outputs.cache-hit != 'true'
       shell: bash
-      run: npm ci
+      run: ${{ inputs.NPM_INSTALL_COMMAND }}
 
     - name: NPM Build
       shell: bash
