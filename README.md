@@ -24,7 +24,7 @@ jobs:
           SSH_USER: ssh-user
           APP_NAME: app-name
           APP_PATH: "" # leave blank for /srv/users/<SSH_USER>/apps/<APP_NAME>
-          COMPOSER_COMMAND: "" # leave blank for composer
+          COMPOSER_COMMAND: "" # leave blank for composer install --no-progress --optimize-autoloader
           BUILD_COMMAND: "npm run dev"
           ARTISAN_COMMANDS: |
             php artisan storage:link --force
