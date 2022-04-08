@@ -34,7 +34,7 @@ jobs:
       - name: Laravel Deployment Action
         # You may pin to the exact commit or the version.
         # uses: Pentangle/laravel-deployment-action@a6342bb89f4907d7b1bfd907cd61236ea4088b88
-        uses: Pentangle/laravel-deployment-action@v2
+        uses: Pentangle/laravel-deployment-action@v2.0.3
         with:
           # SSH key for deploying, Should be added as a **secret**
           DEPLOY_KEY: 
