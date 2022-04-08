@@ -17,8 +17,10 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
+
   # This workflow contains a single job called "build"
   build:
+  
     # Trigger workflow on the branch in question
     if: ${{ github.ref == 'refs/heads/main' }}
     # The type of runner that the job will run on
@@ -46,7 +48,9 @@ jobs:
           APP_NAME: 
           # leave blank for /srv/users/<SSH_USER>/apps/<APP_NAME>
           APP_PATH: # optional
-          # 
+          # leave blank for 8.0
+          PHP_VERSION: 8.0
+          # composer command
           COMPOSER_COMMAND: # optional, default is composer install --no-progress --optimize-autoloader
           # version of node to install
           NODE_VERSION: # optional, default is 16.14
