@@ -35,6 +35,10 @@ inputs:
   ARTISAN_COMMANDS:
     description: 'Commands to run after build on remote server from the APP_PATH directory'
     required: false
+  ARTISAN_FAIL_ON_ERROR:
+    description: 'Whether to fail the action if artisan commands fail'
+    required: false
+    default: false
   PHP_VERSION:
     description: 'Which version of PHP to use'
     required: false
@@ -133,6 +137,7 @@ runs:
         host: ${{ inputs.SERVER_IP }}
         username: ${{inputs.SSH_USER}}
         key: ${{ inputs.DEPLOY_KEY }}
+        script_stop: ${{ inputs.ARTISAN_FAIL_ON_ERROR || false }}
         script: |
           cd ${{ inputs.APP_PATH || env.APP_PATH }}
           ${{ inputs.ARTISAN_COMMANDS }}
