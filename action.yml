@@ -7,47 +7,47 @@ branding:
 
 inputs:
   DEPLOY_KEY:
-    description: 'SSH key for deploying, Should be added as a **secret**'
+    description: 'Deploy Key'
     required: true
   SERVER_IP:
-    description: 'IP address of the server being deployed to, Should be added as a **secret**'
+    description: 'SERVER_IP'
     required: true
   SERVER_PORT:
     description: 'Custom port for ssh and rsync'
+    required: false
     default: 22
   SSH_USER:
-    description: 'required, used for SSH and deployment path if APP_PATH not specified'
+    description: 'SSH user'
     required: true
   APP_NAME:
-    description: 'required, used for deployment path if APP_PATH not specified'
+    description: 'name of the app used on the server'
     required: true
   APP_PATH:
-    description: 'leave blank for /srv/users/<SSH_USER>/apps/<APP_NAME>'
+    description: 'Path to the app'
     required: false
   COMPOSER_COMMAND:
-    description: ''
+    description: 'composer command - defaults to "composer install --no-progress --optimize-autoloader"'
+    required: false
     default: composer install --no-progress --optimize-autoloader
-    required: false
-  NODE_VERSION:
-    description: 'version of node to install'
-    default: 16.14
-    required: false
-  NPM_INSTALL_COMMAND:
-    description: 'requires package-lock.json to be present'
-    default: npm ci --quiet
-    required: false
   BUILD_COMMAND:
-    description: 'build process command'
-    default: npm run dev
-    required: false
+    description: 'npm build command - defaults to "npm run dev"'
+    required: true
   ARTISAN_COMMANDS:
-    description: 'commands to run on server with prefix'
-    default: php artisan inspire
+    description: 'Commands to run after build on remote server from the APP_PATH directory'
     required: false
+  PHP_VERSION:
+    description: 'Which version of PHP to use'
+    required: false
+    default: '8.0'
 
 runs:
   using: "composite"
   steps:
+    - name: Setup PHP ${{ inputs.PHP_VERSION }} with PECL extension
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ inputs.PHP_VERSION }}
+
     - name: Set the APP_PATH environment variable
       id: step_one
       if: ${{ inputs.APP_PATH == '' }}
@@ -61,36 +61,54 @@ runs:
       run: |
         echo "${{ inputs.APP_PATH || env.APP_PATH }}" # This will output the path
 
+    - name: Npm File Exists
+      id: check_npm_file
+      uses: andstor/file-existence-action@v1.1.0
+      with:
+        files: "package.json"
+        allow_failure: false
+
+    - name: Composer File Exists
+      id: check_composer_file
+      uses: andstor/file-existence-action@v1.1.0
+      with:
+        files: "composer.json"
+        allow_failure: false
+
     - name: Cache Composer dependencies
+      if: steps.check_composer_file.outputs.files_exists == 'true'
       id: composer-cache
       uses: actions/cache@v2
       with:
         path: /tmp/composer-cache
-        key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+        key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}-v2
 
     - name: Install dependencies
-      if: steps.composer-cache.outputs.cache-hit != 'true'
+      if: steps.check_composer_file.outputs.files_exists == 'true' && steps.composer-cache.outputs.cache-hit != 'true'
       shell: bash
       run: ${{ inputs.COMPOSER_COMMAND }}
 
     - name: Setup Node.js 16.14
+      if: steps.check_npm_file.outputs.files_exists == 'true'
       uses: actions/setup-node@v2
       with:
-        node-version: ${{ inputs.NODE_VERSION }}
+        node-version: 16.14
 
     - name: Cache Node Modules
+      if: steps.check_npm_file.outputs.files_exists == 'true' && steps.node-cache.outputs.cache-hit != 'true'
       id: node-cache
       uses: actions/cache@v2
       with:
         path: node_modules
-        key: node-modules-${{ hashFiles('package-lock.json') }}
+        key: node-modules-${{ hashFiles('package-lock.json') }}-v2
 
     - name: Install Dependencies
-      if: steps.node-cache.outputs.cache-hit != 'true'
+      if: steps.check_npm_file.outputs.files_exists == 'true' && steps.node-cache.outputs.cache-hit != 'true'
       shell: bash
-      run: ${{ inputs.NPM_INSTALL_COMMAND }}
+      run: npm ci
 
     - name: NPM Build
+      if: steps.check_npm_file.outputs.files_exists == 'true'
       shell: bash
       run: ${{ inputs.BUILD_COMMAND }}
 
