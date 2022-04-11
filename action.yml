@@ -9,40 +9,52 @@ inputs:
   DEPLOY_KEY:
     description: 'Deploy Key'
     required: true
+    type: string
   SERVER_IP:
     description: 'SERVER_IP'
     required: true
+    type: string
   SERVER_PORT:
     description: 'Custom port for ssh and rsync'
     required: false
+    type: integer
     default: 22
   SSH_USER:
     description: 'SSH user'
     required: true
+    type: string
   APP_NAME:
     description: 'name of the app used on the server'
     required: true
+    type: string
   APP_PATH:
     description: 'Path to the app'
     required: false
+    type: string
   COMPOSER_COMMAND:
     description: 'composer command - defaults to "composer install --no-progress --optimize-autoloader"'
     required: false
+    type: string
     default: composer install --no-progress --optimize-autoloader
   BUILD_COMMAND:
     description: 'npm build command - defaults to "npm run dev"'
     required: true
+    type: string
+    default: npm run dev
   ARTISAN_COMMANDS:
     description: 'Commands to run after build on remote server from the APP_PATH directory'
     required: false
+    type: string
   ARTISAN_FAIL_ON_ERROR:
     description: 'Whether to fail the action if artisan commands fail'
     required: false
+    type: boolean
     default: false
   PHP_VERSION:
     description: 'Which version of PHP to use'
     required: false
     default: '8.0'
+    type: string
 
 runs:
   using: "composite"
