@@ -55,6 +55,17 @@ inputs:
     required: false
     default: '8.0'
     type: string
+  NODE_VERSION:
+    description: 'Which version of Node to use'
+    required: false
+    default: '16.14'
+    type: string
+  NPM_INSTALL_COMMAND:
+    description: 'npm install command - defaults to "npm install"'
+    required: false
+    type: string
+    default: npm ci
+
 
 runs:
   using: "composite"
@@ -121,7 +132,7 @@ runs:
     - name: Install Dependencies
       if: steps.check_npm_file.outputs.files_exists == 'true' && steps.node-cache.outputs.cache-hit != 'true'
       shell: bash
-      run: npm ci
+      run: ${{ inputs.NPM_INSTALL_COMMAND || npm ci }}
 
     - name: NPM Build
       if: steps.check_npm_file.outputs.files_exists == 'true'
