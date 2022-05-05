@@ -24,22 +24,22 @@ jobs:
     # Trigger workflow on the branch in question
     if: ${{ github.ref == 'refs/heads/main' }}
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2.0.1
+      - uses: actions/checkout@v3
 
       - name: Laravel Deployment Action
         # You may pin to the exact commit or the version.
         # uses: Pentangle/laravel-deployment-action@a6342bb89f4907d7b1bfd907cd61236ea4088b88
-        uses: Pentangle/laravel-deployment-action@v2.0.3
+        uses: Pentangle/laravel-deployment-action@v2.1.6
         with:
           # SSH key for deploying, Should be added as a **secret**
-          DEPLOY_KEY: 
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
           # IP address of the server being deployed to, Should be added as a **secret**
-          SERVER_IP: 
+          SERVER_IP: ${{ secrets.SERVER_IP }}
           # Custom port for ssh and rsync
           SERVER_PORT: # optional, default is 22
           # required, used for SSH and deployment path if APP_PATH not specified
@@ -59,6 +59,7 @@ jobs:
           # build process command
           BUILD_COMMAND: # optional, default is npm run dev
           # commands to run on server with prefix
-          ARTISAN_COMMANDS: # optional, default is php artisan inspire
+          ARTISAN_COMMANDS: | # optional, default is php artisan inspire
+            php artisan inspire
           # stop artisan commands on error
           ARTISAN_FAIL_ON_ERROR: # optional, default is false
