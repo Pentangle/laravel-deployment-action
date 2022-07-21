@@ -60,6 +60,7 @@ jobs:
           BUILD_COMMAND: # optional, default is npm run dev
           # commands to run on server with prefix
           ARTISAN_COMMANDS: | # optional, default is php artisan inspire
+            composer dump-autoload
             php artisan inspire
           # stop artisan commands on error
           ARTISAN_FAIL_ON_ERROR: # optional, default is false
