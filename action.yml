@@ -65,6 +65,11 @@ inputs:
     required: false
     type: string
     default: npm ci
+  USE_CACHE:
+    description: 'Show we cache packages? (node_modules/vendor)'
+    required: false
+    type: boolean
+    default: true
 
 
 runs:
@@ -103,7 +108,7 @@ runs:
         allow_failure: false
 
     - name: Cache Composer dependencies
-      if: steps.check_composer_file.outputs.files_exists == 'true'
+      if: ${{ inputs.USE_CACHE }} && steps.check_composer_file.outputs.files_exists == 'true'
       id: composer-cache
       uses: actions/cache@v2
       with:
@@ -122,7 +127,7 @@ runs:
         node-version: 16.14
 
     - name: Cache Node Modules
-      if: steps.check_npm_file.outputs.files_exists == 'true' && steps.node-cache.outputs.cache-hit != 'true'
+      if: ${{ inputs.USE_CACHE }} && steps.check_npm_file.outputs.files_exists == 'true' && steps.node-cache.outputs.cache-hit != 'true'
       id: node-cache
       uses: actions/cache@v2
       with:
