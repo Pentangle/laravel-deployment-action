@@ -11,7 +11,7 @@ inputs:
     required: true
     type: string
   SERVER_IP:
-    description: 'SERVER_IP'
+    description: 'SERVER_IP/SSH_HOST'
     required: true
     type: string
   SERVER_PORT:
@@ -22,6 +22,10 @@ inputs:
   SSH_USER:
     description: 'SSH user'
     required: true
+    type: string
+  SSH_PASSWORD:
+    description: 'SSH password'
+    required: false
     type: string
   APP_NAME:
     description: 'name of the app used on the server'
@@ -159,6 +163,7 @@ runs:
       with:
         host: ${{ inputs.SERVER_IP }}
         username: ${{inputs.SSH_USER}}
+        password: ${{inputs.SSH_PASSWORD}}
         key: ${{ inputs.DEPLOY_KEY }}
         script_stop: ${{ inputs.ARTISAN_FAIL_ON_ERROR || false }}
         script: |
