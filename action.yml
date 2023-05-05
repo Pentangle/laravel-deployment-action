@@ -165,6 +165,7 @@ runs:
             --exclude /.github/ \
             --exclude /node_modules/ \
             ./ ${{env.dest}}
+        fi
 
     - name: multiple command
       uses: appleboy/ssh-action@master
