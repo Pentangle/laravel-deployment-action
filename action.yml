@@ -148,15 +148,23 @@ runs:
         dest: ${{inputs.SSH_USER}}@${{inputs.SERVER_IP}}:${{inputs.APP_PATH || env.APP_PATH}}
       shell: bash
       run: |
-        echo "${{inputs.DEPLOY_KEY}}" > deploy_key
-        chmod 600 ./deploy_key
-        rsync -vzr --stats --checksum \
-          -e 'ssh -i ./deploy_key -o StrictHostKeyChecking=no -p ${{inputs.SERVER_PORT || 22}}' \
-          --exclude /deploy_key \
-          --exclude /.git/ \
-          --exclude /.github/ \
-          --exclude /node_modules/ \
-          ./ ${{env.dest}}
+        if [ -z "${{inputs.DEPLOY_KEY}}" ]; then
+          sshpass -p ${{inputs.SSH_PASSWORD}} rsync -vzr --stats --checksum \
+            -e 'ssh -o StrictHostKeyChecking=no -p ${{inputs.SERVER_PORT || 22}}' \
+            --exclude /.git/ \
+            --exclude /.github/ \
+            --exclude /node_modules/ \
+            ./ ${{env.dest}}
+        else
+          echo "${{inputs.DEPLOY_KEY}}" > deploy_key
+          chmod 600 ./deploy_key
+          rsync -vzr --stats --checksum \
+            -e 'ssh -i ./deploy_key -o StrictHostKeyChecking=no -p ${{inputs.SERVER_PORT || 22}}' \
+            --exclude /deploy_key \
+            --exclude /.git/ \
+            --exclude /.github/ \
+            --exclude /node_modules/ \
+            ./ ${{env.dest}}
 
     - name: multiple command
       uses: appleboy/ssh-action@master
