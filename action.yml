@@ -171,6 +171,7 @@ runs:
       uses: appleboy/ssh-action@master
       with:
         host: ${{ inputs.SERVER_IP }}
+        port: ${{ inputs.SERVER_PORT || 22 }}
         username: ${{inputs.SSH_USER}}
         password: ${{inputs.SSH_PASSWORD}}
         key: ${{ inputs.DEPLOY_KEY }}
