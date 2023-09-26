@@ -154,6 +154,7 @@ runs:
             --exclude /.git/ \
             --exclude /.github/ \
             --exclude /node_modules/ \
+            --delete \
             ./ ${{env.dest}}
         else
           echo "${{inputs.DEPLOY_KEY}}" > deploy_key
@@ -164,6 +165,7 @@ runs:
             --exclude /.git/ \
             --exclude /.github/ \
             --exclude /node_modules/ \
+            --delete \
             ./ ${{env.dest}}
         fi
 
