@@ -11,7 +11,7 @@ inputs:
     required: true
     type: string
   SERVER_IP:
-    description: 'SERVER_IP/SSH_HOST'
+    description: 'SERVER_IP'
     required: true
     type: string
   SERVER_PORT:
@@ -81,7 +81,7 @@ runs:
       shell: bash
       run: |
         echo "APP_PATH=/srv/users/${{inputs.SSH_USER}}/apps/${{inputs.APP_NAME}}" >> $GITHUB_ENV
-        
+
     - name: Use the value
       id: step_two
       shell: bash
@@ -144,27 +144,24 @@ runs:
         dest: ${{inputs.SSH_USER}}@${{inputs.SERVER_IP}}:${{inputs.APP_PATH || env.APP_PATH}}
       shell: bash
       run: |
-          echo "${{inputs.DEPLOY_KEY}}" > deploy_key
-          chmod 600 ./deploy_key
-          rsync -vzr --stats --checksum \
-            -e 'ssh -i ./deploy_key -o StrictHostKeyChecking=no -p ${{inputs.SERVER_PORT || 22}}' \
-            --exclude /deploy_key \
-            --exclude /.git/ \
-            --exclude /.github/ \
-            --exclude /node_modules/ \
-            --delete \
-            ./ ${{env.dest}}
-        fi
+        echo "${{inputs.DEPLOY_KEY}}" > deploy_key
+        chmod 600 ./deploy_key
+        rsync -vzr --stats --checksum \
+          -e 'ssh -i ./deploy_key -o StrictHostKeyChecking=no -p ${{inputs.SERVER_PORT || 22}}' \
+          --exclude /deploy_key \
+          --exclude /.git/ \
+          --exclude /.github/ \
+          --exclude /node_modules/ \
+          --delete
+          ./ ${{env.dest}}
 
     - name: multiple command
       uses: appleboy/ssh-action@master
       with:
         host: ${{ inputs.SERVER_IP }}
-        port: ${{ inputs.SERVER_PORT || 22 }}
         username: ${{inputs.SSH_USER}}
         key: ${{ inputs.DEPLOY_KEY }}
         script_stop: ${{ inputs.ARTISAN_FAIL_ON_ERROR || false }}
         script: |
           cd ${{ inputs.APP_PATH || env.APP_PATH }}
           ${{ inputs.ARTISAN_COMMANDS }}
-
