@@ -23,10 +23,6 @@ inputs:
     description: 'SSH user'
     required: true
     type: string
-  SSH_PASSWORD:
-    description: 'SSH password'
-    required: false
-    type: string
   APP_NAME:
     description: 'name of the app used on the server'
     required: true
@@ -148,15 +144,6 @@ runs:
         dest: ${{inputs.SSH_USER}}@${{inputs.SERVER_IP}}:${{inputs.APP_PATH || env.APP_PATH}}
       shell: bash
       run: |
-        if [ -z "${{inputs.DEPLOY_KEY}}" ]; then
-          sshpass -p ${{inputs.SSH_PASSWORD}} rsync -vzr --stats --checksum \
-            -e 'ssh -o StrictHostKeyChecking=no -p ${{inputs.SERVER_PORT || 22}}' \
-            --exclude /.git/ \
-            --exclude /.github/ \
-            --exclude /node_modules/ \
-            --delete \
-            ./ ${{env.dest}}
-        else
           echo "${{inputs.DEPLOY_KEY}}" > deploy_key
           chmod 600 ./deploy_key
           rsync -vzr --stats --checksum \
@@ -175,7 +162,6 @@ runs:
         host: ${{ inputs.SERVER_IP }}
         port: ${{ inputs.SERVER_PORT || 22 }}
         username: ${{inputs.SSH_USER}}
-        password: ${{inputs.SSH_PASSWORD}}
         key: ${{ inputs.DEPLOY_KEY }}
         script_stop: ${{ inputs.ARTISAN_FAIL_ON_ERROR || false }}
         script: |
