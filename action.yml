@@ -105,7 +105,7 @@ runs:
     - name: Cache Composer dependencies
       if: steps.check_composer_file.outputs.files_exists == 'true'
       id: composer-cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: /tmp/composer-cache
         key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}-v2
@@ -124,7 +124,7 @@ runs:
     - name: Cache Node Modules
       if: steps.check_npm_file.outputs.files_exists == 'true' && steps.node-cache.outputs.cache-hit != 'true'
       id: node-cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: node_modules
         key: node-modules-${{ hashFiles('package-lock.json') }}-v2
